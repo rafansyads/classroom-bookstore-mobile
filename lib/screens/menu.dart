@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:classroom_bookstore/widgets/left_drawer.dart';
+import 'package:classroom_bookstore/screens/bookentries.dart';
+import 'package:classroom_bookstore/screens/bookentry_form.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -30,6 +33,8 @@ class MyHomePage extends StatelessWidget {
         // Warna latar belakang AppBar diambil dari skema warna tema aplikasi.
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      // Left Drawer
+      drawer: const LeftDrawer(),
       // Body halaman dengan padding di sekelilingnya.
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -159,6 +164,25 @@ class ItemCard extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
                 content: Text("Kamu telah menekan tombol ${item.name}!")));
+
+          // Navigasi ke Tambah Buku
+          if (item.name == "Tambah Produk Buku") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BookEntryFormPage(),
+              ),
+            );
+          }
+          else if (item.name == "Lihat Produk Buku") {
+            // Navigasi ke Lihat Buku
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BookEntriesPage(),
+              ),
+            );
+          }
         },
         // Container untuk menyimpan Icon dan Text
         child: Container(

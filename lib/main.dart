@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:classroom_bookstore/menu.dart';
+import 'package:classroom_bookstore/screens/menu.dart';
 
 void main() {
   runApp(const MyApp());
