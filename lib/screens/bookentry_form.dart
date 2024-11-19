@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:classroom_bookstore/screens/menu.dart';
 import 'package:classroom_bookstore/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class BookEntryFormPage extends StatefulWidget {
   const BookEntryFormPage({super.key});
@@ -27,6 +31,7 @@ class _BookEntryFormPageState extends State<BookEntryFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       // AppBar adalah bagian atas halaman yang menampilkan judul.
       appBar: AppBar(
@@ -238,44 +243,44 @@ class _BookEntryFormPageState extends State<BookEntryFormPage> {
               ),
 
               // Widget for Book Published Date
-                Padding(
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   decoration: InputDecoration(
-                  hintText: "Book Published Date",
-                  labelText: "Book Published Date",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
+                    hintText: "Book Published Date",
+                    labelText: "Book Published Date",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
                   ),
                   readOnly: true,
                   onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                    _bookPublishedDate = pickedDate;
-                    });
-                  }
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+                    if (pickedDate != null) {
+                      setState(() {
+                        _bookPublishedDate = pickedDate;
+                      });
+                    }
                   },
                   controller: TextEditingController(
-                  // ignore: unnecessary_null_comparison
-                  text: _bookPublishedDate == null
-                    ? ''
-                    : "${_bookPublishedDate.toLocal()}".split(' ')[0],
+                    // ignore: unnecessary_null_comparison
+                    text: _bookPublishedDate == null
+                        ? ''
+                        : "${_bookPublishedDate.toIso8601String().split('T')[0]}",
                   ),
                   validator: (String? value) {
-                  if (value == null || value.isEmpty) {
-                    return "Book published date must be filled!";
-                  }
-                  return null;
+                    if (value == null || value.isEmpty) {
+                      return "Book published date must be filled!";
+                    }
+                    return null;
                   },
                 ),
-                ),
+              ),
 
               // Widget for Book Pages
               Padding(
@@ -418,45 +423,62 @@ class _BookEntryFormPageState extends State<BookEntryFormPage> {
                       backgroundColor: WidgetStateProperty.all(
                           Theme.of(context).colorScheme.primary),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('The new book entry is saved!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Book Title: $_bookTitle'),
-                                    Text('Book Price: $_bookPrice'),
-                                    Text('Book Description: $_bookDescription'),
-                                    Text('Book Quantity: $_bookQuantity'),
-                                    Text('Book Category: $_bookCategory'),
-                                    Text('Book ISBN13: $_bookIsbn13'),
-                                    Text('Book ISBN10: $_bookIsbn10'),
-                                    Text('Book Published Date: ${_bookPublishedDate.toLocal()}'),
-                                    Text('Book Pages: $_bookPages'),
-                                    Text('Book Language: $_bookLanguage'),
-                                    Text('Book Weight: $_bookWeight'),
-                                    Text('Book Author: $_bookAuthor'),
-                                    Text('Book Publisher: $_bookPublisher'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        // Kirim ke Django dan tunggu respons
+                        // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+                        try {
+                          final response = await request.postJson(
+                            // "http://rafansya-daryltama-classroombookstore.pbp.cs.ui.ac.id/create-flutter/",
+                            "http://localhost:8000/create-flutter/",
+                            jsonEncode(<String, String>{
+                              "user":
+                                  request.cookies['user_id']?.toString() ?? '',
+                              "name": _bookTitle,
+                              "price": _bookPrice.toString(),
+                              "description": _bookDescription,
+                              "quantity": _bookQuantity.toString(),
+                              "category": _bookCategory,
+                              "isbn_13": _bookIsbn13,
+                              "isbn_10": _bookIsbn10,
+                              "published_date":
+                                  _bookPublishedDate.toIso8601String(),
+                              "pages": _bookPages.toString(),
+                              "language": _bookLanguage,
+                              "weight": _bookWeight.toString(),
+                              "author": _bookAuthor,
+                              "publisher": _bookPublisher,
+                              "image":
+                                  "", // Add image URL or file path if available
+                            }),
+                          );
+                          if (context.mounted) {
+                            if (response['status'] == 'success') {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Mood baru berhasil disimpan!"),
+                              ));
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyHomePage()),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text(
+                                    "Terdapat kesalahan, silakan coba lagi."),
+                              ));
+                            }
+                          }
+                        } catch (e) {
+                          print('Error: $e');
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content:
+                                Text("Terjadi kesalahan, silakan coba lagi."),
+                          ));
+                        }
                       }
                     },
                     child: const Text(

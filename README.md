@@ -202,3 +202,28 @@ For Web version, please kindly visit:
 > );
 > ```
 > Pada aplikasi yang saya buat, saya menggunakan `Navigator` untuk berpindah antara halaman-halaman yang berbeda.
+
+### TM9 Questions
+
+#### 1. Jelaskan mengapa kita perlu membuat model untuk melakukan pengambilan ataupun pengiriman data JSON? Apakah akan terjadi error jika kita tidak membuat model terlebih dahulu? (model ada di book_entry.dart)
+> Model diperlukan untuk mempermudah proses pengambilan dan pengiriman data JSON karena model menyediakan struktur yang jelas dan konsisten untuk data yang diterima atau dikirim. Dengan model, kita dapat dengan mudah mengonversi data JSON menjadi objek Dart dan sebaliknya. Jika kita tidak membuat model terlebih dahulu, kita mungkin akan mengalami kesulitan dalam mengelola data yang kompleks dan berisiko terjadi kesalahan dalam parsing atau serialisasi data.
+
+#### 2. Jelaskan fungsi dari library http yang sudah kamu implementasikan pada tugas ini (http library (flutter pub) in dart)
+> Library http digunakan untuk melakukan permintaan HTTP seperti GET, POST, PUT, dan DELETE. Dalam tugas ini, library http digunakan untuk berkomunikasi dengan server Django, mengirimkan data, dan menerima respons dalam format JSON. Library ini mempermudah proses pengiriman dan penerimaan data melalui protokol HTTP.
+
+#### 3. Jelaskan fungsi dari CookieRequest dan jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+> CookieRequest adalah kelas yang digunakan untuk mengelola permintaan HTTP yang memerlukan autentikasi berbasis cookie. Instance CookieRequest perlu dibagikan ke semua komponen di aplikasi Flutter agar setiap komponen dapat mengakses dan mengelola cookie yang sama, memastikan bahwa status autentikasi dan sesi pengguna tetap konsisten di seluruh aplikasi.
+
+#### 4. Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+> Mekanisme pengiriman data dimulai dari input pengguna di aplikasi Flutter. Data ini kemudian dikirim ke server Django melalui permintaan HTTP (misalnya POST). Server Django memproses data tersebut dan mengembalikan respons dalam format JSON. Aplikasi Flutter menerima respons JSON ini, mengonversinya menjadi objek Dart menggunakan model yang telah dibuat, dan menampilkan data tersebut di antarmuka pengguna.
+
+#### 5. Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+> Mekanisme autentikasi dimulai dari input data akun oleh pengguna di aplikasi Flutter. Data ini dikirim ke server Django melalui permintaan HTTP (misalnya POST untuk login atau register). Server Django memverifikasi data tersebut dan, jika valid, mengembalikan respons yang berisi informasi autentikasi (misalnya token atau cookie). Aplikasi Flutter menyimpan informasi autentikasi ini dan menggunakannya untuk mengakses endpoint yang memerlukan autentikasi. Saat logout, aplikasi Flutter mengirim permintaan ke server Django untuk menghapus sesi atau token autentikasi, dan kemudian menghapus informasi autentikasi dari aplikasi.
+
+#### 6. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+> - **Membuat Model**: Saya membuat model BookEntry dan Fields di `book_entry.dart` untuk mempermudah pengelolaan data JSON.
+> - **Menggunakan Library http**: Saya mengimpor library http dan menggunakannya untuk melakukan permintaan HTTP ke server Django.
+> - **Mengimplementasikan CookieRequest**: Saya membuat instance CookieRequest dan membagikannya ke seluruh komponen aplikasi menggunakan Provider.
+> - **Mengirim dan Menerima Data**: Saya mengimplementasikan fungsi untuk mengirim data input pengguna ke server Django dan menerima respons JSON, kemudian menampilkan data tersebut di aplikasi Flutter.
+> - **Autentikasi**: Saya mengimplementasikan mekanisme login, register, dan logout dengan mengirim permintaan HTTP ke server Django dan mengelola informasi autentikasi di aplikasi Flutter.
+> - **Pengujian dan Debugging**: Saya melakukan pengujian dan debugging untuk memastikan semua fungsi berjalan dengan baik dan memperbaiki kesalahan yang ditemukan.
